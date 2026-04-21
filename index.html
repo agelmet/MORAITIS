@@ -33,11 +33,13 @@
                     },
                     boxShadow: {
                         'premium': '0 20px 40px -10px rgba(44, 62, 80, 0.08)',
-                        'hover': '0 30px 60px -15px rgba(44, 62, 80, 0.12)',
+                        'hover': '0 30px 60px -15px rgba(44, 62, 80, 0.25)',
+                        'glow': '0 0 50px -10px rgba(44, 62, 80, 0.15)',
                     },
                     animation: {
                         'marquee': 'marquee 40s linear infinite',
                         'float': 'float 6s ease-in-out infinite',
+                        'blob': 'blob 10s infinite alternate',
                     },
                     keyframes: {
                         marquee: {
@@ -46,7 +48,11 @@
                         },
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '100%': { transform: 'translate(30px, -50px) scale(1.1)' },
                         }
                     }
                 }
@@ -55,7 +61,11 @@
     </script>
 
     <style>
-        body { background-color: #EFE7DC; color: #2C3E50; }
+        body { 
+            background-color: #EFE7DC; 
+            color: #2C3E50; 
+            cursor: none; /* For Custom Cursor */
+        }
         
         /* Smooth Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
@@ -63,32 +73,97 @@
         ::-webkit-scrollbar-thumb { background: #2C3E50; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4A6278; }
 
+        /* Custom Cursor */
+        .cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background-color: #2C3E50;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+        }
+        .cursor-outline {
+            position: fixed;
+            top: 0; left: 0;
+            width: 40px; height: 40px;
+            border: 1px solid rgba(44, 62, 80, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background-color 0.2s ease-out;
+        }
+        .hover-state .cursor-dot {
+            width: 50px; height: 50px;
+            background-color: rgba(44, 62, 80, 0.05);
+            border: 1px solid rgba(44, 62, 80, 0.3);
+        }
+        .hover-state .cursor-outline {
+            width: 0; height: 0; opacity: 0;
+        }
+
         /* Typography & Utilities */
         .text-balance { text-wrap: balance; }
         .no-accents { text-transform: uppercase; letter-spacing: 0.05em; }
         
-        /* Reveal Animations */
-        .reveal { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        /* Advanced Reveals */
+        .reveal { 
+            opacity: 0; 
+            transform: translateY(50px) scale(0.98); 
+            filter: blur(4px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .reveal.active { 
+            opacity: 1; 
+            transform: translateY(0) scale(1); 
+            filter: blur(0);
+        }
         .delay-100 { transition-delay: 100ms; }
         .delay-200 { transition-delay: 200ms; }
-        .delay-300 { transition-delay: 300ms; }
 
-        /* Image Effects */
-        .img-container { overflow: hidden; }
-        .img-container img { transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease; }
-        .img-container:hover img { transform: scale(1.03); }
+        /* Image Masking & Zoom (Luxurious Effects) */
+        .image-hover-zoom {
+            overflow: hidden;
+            position: relative;
+        }
+        .image-hover-zoom::after {
+            content: ''; position: absolute; inset: 0; 
+            background: linear-gradient(to top, rgba(44,62,80,0.15) 0%, transparent 100%); 
+            opacity: 0; transition: opacity 0.8s ease; pointer-events: none;
+        }
+        .image-hover-zoom:hover::after { opacity: 1; }
+        .image-hover-zoom img {
+            transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+        }
+        .image-hover-zoom:hover img {
+            transform: scale(1.06) translateY(-1%);
+        }
         
-        /* Specific BW to Color effect */
+        /* Black & White to Color effect */
         .bw-to-color { filter: grayscale(100%); }
-        .bw-to-color:hover { filter: grayscale(0%); }
+        .image-hover-zoom:hover .bw-to-color { filter: grayscale(0%); }
+
+        /* Ambient Glows */
+        .hero-glow-1 {
+            position: absolute; width: 600px; height: 600px; 
+            background: radial-gradient(circle, rgba(44,62,80,0.06) 0%, rgba(239,231,220,0) 70%); 
+            top: -100px; right: -100px; border-radius: 50%; z-index: 0; pointer-events: none;
+        }
+        .hero-glow-2 {
+            position: absolute; width: 500px; height: 500px; 
+            background: radial-gradient(circle, rgba(44,62,80,0.04) 0%, rgba(239,231,220,0) 70%); 
+            bottom: -50px; left: -100px; border-radius: 50%; z-index: 0; pointer-events: none;
+        }
 
         /* Marquee specific */
         .marquee-wrapper { display: flex; width: 200%; }
         .marquee-wrapper:hover { animation-play-state: paused; }
 
         /* Lightbox */
-        #lightbox { opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        #lightbox { opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
         #lightbox.active { opacity: 1; pointer-events: auto; }
         #lightbox img { transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         #lightbox.active img { transform: scale(1); }
@@ -104,103 +179,136 @@
 </head>
 <body class="font-sans antialiased overflow-x-hidden selection:bg-brand-dark selection:text-brand-bg relative" id="top">
 
+    <div class="cursor-dot hidden lg:block"></div>
+    <div class="cursor-outline hidden lg:block"></div>
+
     <div class="fixed inset-0 pointer-events-none opacity-[0.03] z-50" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"></div>
 
     <nav class="fixed w-full z-40 transition-all duration-500 py-6" id="navbar">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="flex justify-between items-center bg-brand-bg/80 backdrop-blur-md px-8 py-4 rounded-full border border-brand-dark/10 shadow-premium transition-all hover:border-brand-dark/20">
-                <a href="#top" class="flex items-center gap-3 cursor-pointer group">
-                    <img src="https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/logo%204.png" alt="Μιχάλης Μωραΐτης Logo" class="h-10 w-auto object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-md">
+            <div class="flex justify-between items-center bg-brand-bg/70 backdrop-blur-xl px-8 py-4 rounded-full border border-brand-dark/10 shadow-premium transition-all hover:border-brand-dark/20">
+                <a href="#top" class="flex items-center gap-3 hover-trigger group">
+                    <img src="https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/logo%204.png" alt="Μιχάλης Μωραΐτης Logo" class="h-10 w-auto object-contain transition-transform duration-700 group-hover:scale-105 drop-shadow-sm">
                 </a>
                 
                 <div class="hidden md:flex items-center space-x-10">
-                    <a href="#about" class="text-sm font-medium tracking-wide hover:opacity-70 transition-opacity">ΣΧΕΤΙΚΑ</a>
-                    <a href="#services" class="text-sm font-medium tracking-wide hover:opacity-70 transition-opacity">ΥΠΗΡΕΣΙΕΣ</a>
-                    <a href="#approach" class="text-sm font-medium tracking-wide hover:opacity-70 transition-opacity">ΠΡΟΣΕΓΓΙΣΗ</a>
-                    <a href="#reviews" class="text-sm font-medium tracking-wide hover:opacity-70 transition-opacity">ΑΞΙΟΛΟΓΗΣΕΙΣ</a>
+                    <a href="#about" class="text-xs font-semibold tracking-widest no-accents hover-trigger relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-0 after:h-[1px] after:bg-brand-dark after:transition-all after:duration-300 hover:after:w-full transition-colors">ΣΧΕΤΙΚΑ</a>
+                    <a href="#services" class="text-xs font-semibold tracking-widest no-accents hover-trigger relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-0 after:h-[1px] after:bg-brand-dark after:transition-all after:duration-300 hover:after:w-full transition-colors">ΥΠΗΡΕΣΙΕΣ</a>
+                    <a href="#approach" class="text-xs font-semibold tracking-widest no-accents hover-trigger relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-0 after:h-[1px] after:bg-brand-dark after:transition-all after:duration-300 hover:after:w-full transition-colors">ΠΡΟΣΕΓΓΙΣΗ</a>
+                    <a href="#reviews" class="text-xs font-semibold tracking-widest no-accents hover-trigger relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-0 after:h-[1px] after:bg-brand-dark after:transition-all after:duration-300 hover:after:w-full transition-colors">ΑΞΙΟΛΟΓΗΣΕΙΣ</a>
                     
-                    <button data-cal-link="μιχαλης-μωραιτης-gxj3qi/40min" data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}' class="px-8 py-3 bg-brand-dark text-brand-bg rounded-full text-sm font-medium hover:bg-brand-light transition-all transform hover:-translate-y-0.5 shadow-lg">
+                    <button data-cal-link="μιχαλης-μωραιτης-gxj3qi/40min" data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}' class="hover-trigger px-8 py-3.5 bg-brand-dark text-brand-bg rounded-full text-xs font-semibold tracking-widest no-accents hover:bg-brand-light transition-all duration-300 transform hover:-translate-y-1 shadow-hover">
                         ΚΛΕΙΣΤΕ ΡΑΝΤΕΒΟΥ
                     </button>
                 </div>
 
-                <button class="md:hidden text-brand-dark focus:outline-none" id="mobile-menu-btn">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
+                <button class="md:hidden text-brand-dark focus:outline-none hover-trigger" id="mobile-menu-btn">
+                    <div class="space-y-1.5 p-2">
+                        <span class="block w-6 h-0.5 bg-brand-dark transition-all duration-300"></span>
+                        <span class="block w-4 h-0.5 bg-brand-dark transition-all duration-300 ml-auto"></span>
+                        <span class="block w-6 h-0.5 bg-brand-dark transition-all duration-300"></span>
+                    </div>
                 </button>
             </div>
         </div>
         
-        <div id="mobile-menu" class="absolute top-full left-6 right-6 mt-2 bg-brand-bg/95 backdrop-blur-xl rounded-3xl shadow-premium hidden flex-col items-center py-10 space-y-8 border border-brand-dark/10">
-            <a href="#about" class="text-lg font-medium mobile-link">ΣΧΕΤΙΚΑ</a>
-            <a href="#services" class="text-lg font-medium mobile-link">ΥΠΗΡΕΣΙΕΣ</a>
-            <a href="#approach" class="text-lg font-medium mobile-link">ΠΡΟΣΕΓΓΙΣΗ</a>
-            <a href="#reviews" class="text-lg font-medium mobile-link">ΑΞΙΟΛΟΓΗΣΕΙΣ</a>
-            <button data-cal-link="μιχαλης-μωραιτης-gxj3qi/40min" data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}' class="px-8 py-4 bg-brand-dark text-brand-bg rounded-full text-lg font-medium mobile-link w-3/4 max-w-xs">
+        <div id="mobile-menu" class="absolute top-full left-6 right-6 mt-2 bg-brand-bg/95 backdrop-blur-2xl rounded-3xl shadow-hover hidden flex-col items-center py-10 space-y-8 border border-brand-dark/10">
+            <a href="#about" class="text-sm font-medium tracking-widest no-accents mobile-link hover:opacity-70">ΣΧΕΤΙΚΑ</a>
+            <a href="#services" class="text-sm font-medium tracking-widest no-accents mobile-link hover:opacity-70">ΥΠΗΡΕΣΙΕΣ</a>
+            <a href="#approach" class="text-sm font-medium tracking-widest no-accents mobile-link hover:opacity-70">ΠΡΟΣΕΓΓΙΣΗ</a>
+            <a href="#reviews" class="text-sm font-medium tracking-widest no-accents mobile-link hover:opacity-70">ΑΞΙΟΛΟΓΗΣΕΙΣ</a>
+            <button data-cal-link="μιχαλης-μωραιτης-gxj3qi/40min" data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}' class="px-8 py-4 bg-brand-dark text-brand-bg rounded-full text-sm font-semibold tracking-widest no-accents mobile-link w-3/4 max-w-xs shadow-lg">
                 ΚΛΕΙΣΤΕ ΡΑΝΤΕΒΟΥ
             </button>
         </div>
     </nav>
 
     <section class="relative min-h-[100svh] flex items-center pt-32 pb-20 px-6 overflow-hidden">
-        <div class="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center relative z-10">
+        <div class="hero-glow-1 animate-blob"></div>
+        <div class="hero-glow-2 animate-blob" style="animation-delay: 3s;"></div>
+
+        <div class="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 lg:gap-24 items-center relative z-10">
             
             <div class="text-center md:text-left order-2 md:order-1 reveal">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-dark/20 text-brand-dark text-xs font-semibold mb-8 no-accents tracking-widest bg-brand-bg">
-                    <span class="w-1.5 h-1.5 rounded-full bg-brand-dark"></span>
-                    ΨΥΧΟΛΟΓΟΣ & ΨΥΧΟΘΕΡΑΠΕΥΤΗΣ
+                <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-brand-dark/15 bg-white/40 backdrop-blur-md shadow-sm hover-trigger mb-8">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-dark opacity-40"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-dark"></span>
+                    </span>
+                    <span class="text-xs font-bold uppercase tracking-[0.2em] text-brand-dark/80">ΨΥΧΟΛΟΓΟΣ & ΨΥΧΟΘΕΡΑΠΕΥΤΗΣ</span>
                 </div>
                 
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif text-brand-dark leading-[1.15] mb-8 text-balance">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif text-brand-dark leading-[1.1] mb-8 text-balance drop-shadow-sm">
                     Ψυχοθεραπεία Χωρίς «Πρέπει», με τον <span class="italic font-light">Δικό σας Ρυθμό.</span>
                 </h1>
                 
-                <p class="text-lg text-brand-light mb-10 max-w-lg mx-auto md:mx-0 leading-relaxed font-light">
+                <p class="text-lg md:text-xl text-brand-light mb-10 max-w-lg mx-auto md:mx-0 leading-relaxed font-light">
                     Γνωσιακή Συμπεριφορική Προσέγγιση (CBT). Ένας ασφαλής χώρος, διαδικτυακά, για να κατανοήσετε τον εαυτό σας και να διαχειριστείτε την καθημερινότητα.
                 </p>
                 
-                <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-                    <button data-cal-link="μιχαλης-μωραιτης-gxj3qi/40min" data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}' class="w-full sm:w-auto px-10 py-4 bg-brand-dark text-brand-bg rounded-full font-medium hover:bg-brand-light transition-colors shadow-premium flex items-center justify-center gap-3 group">
+                <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-5">
+                    <button data-cal-link="μιχαλης-μωραιτης-gxj3qi/40min" data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}' class="w-full sm:w-auto hover-trigger px-10 py-5 bg-brand-dark text-brand-bg rounded-full text-xs font-bold uppercase tracking-[0.2em] hover:shadow-hover flex items-center justify-center gap-4 group transition-all duration-500 transform hover:-translate-y-1">
                         ΞΕΚΙΝΗΣΤΕ ΤΟ ΤΑΞΙΔΙ
-                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        <div class="w-8 h-8 rounded-full bg-brand-bg/10 flex items-center justify-center group-hover:bg-brand-bg group-hover:text-brand-dark transition-colors duration-500">
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
                     </button>
                 </div>
             </div>
 
-            <div class="order-1 md:order-2 reveal delay-200 relative px-4 md:px-0">
-                <div class="relative rounded-[2.5rem] overflow-hidden shadow-premium img-container border-8 border-brand-bg/50 cursor-zoom-in" onclick="openLightbox('https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%202..jpg')">
-                    <img src="https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%202..jpg" alt="Μιχάλης Μωραΐτης" class="w-full h-auto max-h-[70vh] object-cover object-top">
+            <div class="order-1 md:order-2 reveal delay-200 relative px-4 md:px-0 group">
+                <div class="absolute inset-0 rounded-[2.5rem] border border-brand-dark/15 transform rotate-3 scale-[1.02] transition-transform duration-1000 group-hover:rotate-6"></div>
+                
+                <div class="relative image-hover-zoom rounded-[2.5rem] shadow-premium hover:shadow-hover transition-shadow duration-700 hover-trigger animate-float cursor-none" onclick="openLightbox('https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%202..jpg')">
+                    <img src="https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%202..jpg" alt="Μιχάλης Μωραΐτης" class="w-full h-auto max-h-[75vh] object-cover object-top rounded-[2.5rem]">
                 </div>
                 
-                <div class="absolute -bottom-8 -left-8 w-40 h-40 border border-brand-dark/10 rounded-full animate-float hidden md:block z-[-1]"></div>
+                <div class="absolute -bottom-6 -left-6 md:-bottom-10 md:-left-10 bg-white/80 p-5 md:p-6 rounded-3xl shadow-hover backdrop-blur-xl border border-white flex items-center gap-4 hover-trigger z-20 transition-transform duration-500 hover:-translate-y-2">
+                    <div class="w-12 h-12 rounded-full bg-brand-bg flex items-center justify-center text-brand-dark shadow-inner">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-light mb-0.5">ΠΙΣΤΟΠΟΙΗΜΕΝΟΣ</p>
+                        <p class="font-serif font-bold text-lg text-brand-dark leading-none">CBT Προσέγγιση</p>
+                    </div>
+                </div>
             </div>
             
         </div>
     </section>
 
-    <section id="about" class="py-24 px-6 relative">
-        <div class="max-w-6xl mx-auto">
-            <div class="border border-brand-dark/15 rounded-[3rem] p-8 md:p-16 relative bg-brand-bg shadow-premium reveal">
-                <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-brand-dark text-brand-bg px-6 py-2 rounded-full text-sm font-medium tracking-wide shadow-lg whitespace-nowrap">
-                    Αρ. Αδείας: 1496713
+    <section id="about" class="py-32 px-6 relative overflow-hidden">
+        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-dark/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto">
+            <div class="border border-brand-dark/10 rounded-[3rem] p-8 md:p-16 lg:p-20 relative bg-white/40 backdrop-blur-3xl shadow-premium reveal hover:shadow-hover transition-shadow duration-700">
+                
+                <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-brand-dark text-brand-bg px-8 py-2.5 rounded-full text-xs font-bold tracking-[0.2em] shadow-lg whitespace-nowrap">
+                    ΑΡ. ΑΔΕΙΑΣ: 1496713
                 </div>
 
-                <div class="grid lg:grid-cols-12 gap-12 items-center mt-6">
-                    <div class="lg:col-span-5 reveal delay-100">
-                        <div class="rounded-2xl overflow-hidden img-container cursor-zoom-in shadow-premium" onclick="openLightbox('https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%201.jpg')">
+                <div class="grid lg:grid-cols-12 gap-16 items-center mt-6">
+                    
+                    <div class="lg:col-span-5 reveal delay-100 relative group">
+                        <div class="absolute inset-0 rounded-[2rem] border border-brand-dark/10 transform -rotate-3 scale-[1.03] transition-transform duration-1000 group-hover:-rotate-6"></div>
+                        <div class="rounded-[2rem] overflow-hidden image-hover-zoom hover-trigger shadow-premium relative z-10 cursor-none" onclick="openLightbox('https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%201.jpg')">
                             <img src="https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%201.jpg" alt="Μιχάλης Μωραΐτης Πορτρέτο" class="w-full h-auto object-cover bw-to-color">
                         </div>
                     </div>
-                    <div class="lg:col-span-7 space-y-6 text-brand-dark/80 font-light leading-relaxed reveal delay-200">
-                        <p class="text-xl md:text-2xl font-serif text-brand-dark leading-snug mb-8">
+
+                    <div class="lg:col-span-7 space-y-8 text-brand-dark/80 font-light leading-relaxed reveal delay-200">
+                        <h2 class="text-3xl md:text-4xl font-serif text-brand-dark leading-snug mb-4">
                             Ο Μιχάλης Μωραΐτης (BSc, PGDip, PGCert) είναι αδειούχος Ψυχολόγος και Ψυχοθεραπευτής.
+                        </h2>
+                        <div class="w-20 h-1 bg-brand-dark/20 rounded-full mb-8"></div>
+                        
+                        <p class="text-lg">
+                            Παρέχει ατομικές συνεδρίες <strong class="font-medium text-brand-dark">αποκλειστικά διαδικτυακά</strong> (μέσω βιντεοκλήσης), προσφέροντας υποστήριξη σε άτομα σε όλη την Ελλάδα και το εξωτερικό. Είναι απόφοιτος Ψυχολογίας του βρετανικού University of East London (UEL), με επιπλέον πιστοποιημένη μετεκπαίδευση στη διαχείριση τραυματικών γεγονότων και απώλειας από το Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών (Ε.Κ.Π.Α.).
                         </p>
-                        <p>
-                            Παρέχει ατομικές συνεδρίες <strong>αποκλειστικά διαδικτυακά</strong> (μέσω βιντεοκλήσης), προσφέροντας υποστήριξη σε άτομα σε όλη την Ελλάδα και το εξωτερικό. Είναι απόφοιτος Ψυχολογίας του βρετανικού University of East London (UEL), με επιπλέον πιστοποιημένη μετεκπαίδευση στη διαχείριση τραυματικών γεγονότων και απώλειας από το Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών (Ε.Κ.Π.Α.).
+                        <p class="text-lg pl-6 border-l-2 border-brand-dark/30 italic">
+                            Η κλινική του πρακτική βασίζεται στη <strong class="font-medium text-brand-dark">Γνωσιακή Συμπεριφορική Προσέγγιση (CBT)</strong>. Ωστόσο, η φιλοσοφία του είναι βαθιά ανθρώπινη και απο-παθολογικοποιημένη: πιστεύει ακράδαντα πως δεν χρειάζεται απαραίτητα να αντιμετωπίζετε κάτι «σοβαρό» ή κάποια κλινική διαταραχή για να ξεκινήσετε ψυχοθεραπεία. 
                         </p>
-                        <p>
-                            Η κλινική του πρακτική βασίζεται στη <strong>Γνωσιακή Συμπεριφορική Προσέγγιση (CBT)</strong>. Ωστόσο, η φιλοσοφία του είναι βαθιά ανθρώπινη και απο-παθολογικοποιημένη: πιστεύει ακράδαντα πως δεν χρειάζεται απαραίτητα να αντιμετωπίζετε κάτι «σοβαρό» ή κάποια κλινική διαταραχή για να ξεκινήσετε ψυχοθεραπεία. 
-                        </p>
-                        <p>
+                        <p class="text-lg">
                             Το διαδικτυακό του γραφείο είναι ένας χώρος για όσους βιώνουν καθημερινή πίεση, άγχος, δυσκολίες στις σχέσεις, ή απλώς επιθυμούν να κατανοήσουν καλύτερα τον εαυτό τους. Η πρώτη σας συνάντηση λειτουργεί καθαρά ως μια ήρεμη, διερευνητική γνωριμία, χωρίς καμία πίεση ή υποχρέωση συνέχισης.
                         </p>
                     </div>
@@ -212,301 +320,306 @@
     <section id="services" class="py-24 px-6 relative">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-20 reveal">
-                <span class="text-brand-dark font-semibold tracking-widest text-xs uppercase opacity-60">ΟΜΑΔΟΠΟΙΗΜΕΝΕΣ ΥΠΗΡΕΣΙΕΣ</span>
+                <span class="text-brand-dark font-bold tracking-[0.2em] text-[10px] uppercase opacity-60">ΟΜΑΔΟΠΟΙΗΜΕΝΕΣ ΥΠΗΡΕΣΙΕΣ</span>
                 <h2 class="text-4xl md:text-5xl font-serif text-brand-dark mt-4 mb-6">Πώς Μπορώ να Βοηθήσω</h2>
                 <div class="w-16 h-px bg-brand-dark/30 mx-auto"></div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="group bg-transparent border border-brand-dark/15 p-10 rounded-[2rem] hover:bg-brand-dark hover:border-transparent transition-all duration-500 reveal cursor-default">
-                    <div class="w-14 h-14 rounded-full border border-brand-dark/20 flex items-center justify-center mb-8 group-hover:border-brand-bg/30 transition-colors">
-                        <i data-lucide="laptop" class="w-6 h-6 text-brand-dark group-hover:text-brand-bg transition-colors"></i>
+            <div class="grid md:grid-cols-2 gap-8 lg:gap-10">
+                <div class="group bg-white/40 backdrop-blur-sm border border-brand-dark/10 p-10 md:p-12 rounded-[2.5rem] hover:bg-brand-dark transition-all duration-500 hover:shadow-hover reveal hover-trigger">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-bg shadow-sm flex items-center justify-center mb-8 group-hover:bg-brand-dark group-hover:border group-hover:border-brand-bg/20 transition-all duration-500 transform group-hover:-translate-y-2">
+                        <i data-lucide="laptop" class="w-7 h-7 text-brand-dark group-hover:text-brand-bg transition-colors"></i>
                     </div>
-                    <h3 class="text-2xl font-serif text-brand-dark mb-4 group-hover:text-brand-bg transition-colors">Διαδικτυακή Ψυχοθεραπεία & Διαχείριση Άγχους</h3>
-                    <p class="text-brand-light font-light leading-relaxed mb-6 group-hover:text-brand-bg/80 transition-colors">
+                    <h3 class="text-3xl font-serif text-brand-dark mb-4 group-hover:text-brand-bg transition-colors">Διαδικτυακή Ψυχοθεραπεία & Άγχος</h3>
+                    <p class="text-brand-light font-light text-lg leading-relaxed mb-8 group-hover:text-brand-bg/80 transition-colors">
                         Το καθημερινό άγχος, οι αγωνίες, οι φοβίες και οι κρίσεις πανικού συχνά μας εμποδίζουν να χαρούμε τη ζωή. Συνεργαζόμαστε για να εντοπίσουμε τα μοτίβα σκέψης, μεταφράζοντας την κατανόηση σε πρακτικές αλλαγές για τον έλεγχο του στρες.
                     </p>
-                    <div class="text-xs font-medium text-brand-dark/60 group-hover:text-brand-bg/60 uppercase tracking-wide">
-                        Ψυχοθεραπεία Online • Άγχος • Φοβίες
+                    <div class="text-[10px] font-bold text-brand-dark/60 group-hover:text-brand-bg/60 uppercase tracking-[0.2em] bg-brand-dark/5 group-hover:bg-white/10 inline-block px-4 py-2 rounded-lg transition-colors">
+                        Online (40') • Άγχος • Φοβίες
                     </div>
                 </div>
 
-                <div class="group bg-transparent border border-brand-dark/15 p-10 rounded-[2rem] hover:bg-brand-dark hover:border-transparent transition-all duration-500 reveal delay-100 cursor-default">
-                    <div class="w-14 h-14 rounded-full border border-brand-dark/20 flex items-center justify-center mb-8 group-hover:border-brand-bg/30 transition-colors">
-                        <i data-lucide="heart-crack" class="w-6 h-6 text-brand-dark group-hover:text-brand-bg transition-colors"></i>
+                <div class="group bg-white/40 backdrop-blur-sm border border-brand-dark/10 p-10 md:p-12 rounded-[2.5rem] hover:bg-brand-dark transition-all duration-500 hover:shadow-hover reveal delay-100 hover-trigger">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-bg shadow-sm flex items-center justify-center mb-8 group-hover:bg-brand-dark group-hover:border group-hover:border-brand-bg/20 transition-all duration-500 transform group-hover:-translate-y-2">
+                        <i data-lucide="heart-crack" class="w-7 h-7 text-brand-dark group-hover:text-brand-bg transition-colors"></i>
                     </div>
-                    <h3 class="text-2xl font-serif text-brand-dark mb-4 group-hover:text-brand-bg transition-colors">Διαχείριση Τραύματος & Πένθους</h3>
-                    <p class="text-brand-light font-light leading-relaxed mb-6 group-hover:text-brand-bg/80 transition-colors">
+                    <h3 class="text-3xl font-serif text-brand-dark mb-4 group-hover:text-brand-bg transition-colors">Διαχείριση Τραύματος & Πένθους</h3>
+                    <p class="text-brand-light font-light text-lg leading-relaxed mb-8 group-hover:text-brand-bg/80 transition-colors">
                         Αξιοποιώντας ειδική μετεκπαίδευση (Ε.Κ.Π.Α.), παρέχεται ένα απόλυτα ασφαλές πλαίσιο για την επεξεργασία του πόνου. Είτε πρόκειται για απώλεια είτε για τραυματική εμπειρία, προχωράμε βήμα-βήμα, με απόλυτο σεβασμό στον δικό σας χρόνο.
                     </p>
-                    <div class="text-xs font-medium text-brand-dark/60 group-hover:text-brand-bg/60 uppercase tracking-wide">
+                    <div class="text-[10px] font-bold text-brand-dark/60 group-hover:text-brand-bg/60 uppercase tracking-[0.2em] bg-brand-dark/5 group-hover:bg-white/10 inline-block px-4 py-2 rounded-lg transition-colors">
                         Τραύμα • Διαχείριση Πένθους
                     </div>
                 </div>
 
-                <div class="group bg-transparent border border-brand-dark/15 p-10 rounded-[2rem] hover:bg-brand-dark hover:border-transparent transition-all duration-500 reveal cursor-default">
-                    <div class="w-14 h-14 rounded-full border border-brand-dark/20 flex items-center justify-center mb-8 group-hover:border-brand-bg/30 transition-colors">
-                        <i data-lucide="cloud-rain" class="w-6 h-6 text-brand-dark group-hover:text-brand-bg transition-colors"></i>
+                <div class="group bg-white/40 backdrop-blur-sm border border-brand-dark/10 p-10 md:p-12 rounded-[2.5rem] hover:bg-brand-dark transition-all duration-500 hover:shadow-hover reveal hover-trigger">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-bg shadow-sm flex items-center justify-center mb-8 group-hover:bg-brand-dark group-hover:border group-hover:border-brand-bg/20 transition-all duration-500 transform group-hover:-translate-y-2">
+                        <i data-lucide="cloud-rain" class="w-7 h-7 text-brand-dark group-hover:text-brand-bg transition-colors"></i>
                     </div>
-                    <h3 class="text-2xl font-serif text-brand-dark mb-4 group-hover:text-brand-bg transition-colors">Κατάθλιψη, Θλίψη & Διαχείριση Θυμού</h3>
-                    <p class="text-brand-light font-light leading-relaxed mb-6 group-hover:text-brand-bg/80 transition-colors">
+                    <h3 class="text-3xl font-serif text-brand-dark mb-4 group-hover:text-brand-bg transition-colors">Κατάθλιψη, Θλίψη & Θυμός</h3>
+                    <p class="text-brand-light font-light text-lg leading-relaxed mb-8 group-hover:text-brand-bg/80 transition-colors">
                         Τα καταθλιπτικά συναισθήματα και τα ξεσπάσματα θυμού χρειάζονται χώρο να ακουστούν χωρίς επίκριση. Μέσω της CBT, μαθαίνετε να ρυθμίζετε τη διάθεσή σας, να εκφράζεστε λειτουργικά και να επανασυνδέεστε με τη χαρά.
                     </p>
-                    <div class="text-xs font-medium text-brand-dark/60 group-hover:text-brand-bg/60 uppercase tracking-wide">
-                        Κατάθλιψη • Θλίψη • Διαχείριση Θυμού
+                    <div class="text-[10px] font-bold text-brand-dark/60 group-hover:text-brand-bg/60 uppercase tracking-[0.2em] bg-brand-dark/5 group-hover:bg-white/10 inline-block px-4 py-2 rounded-lg transition-colors">
+                        Κατάθλιψη • Θλίψη • Θυμός
                     </div>
                 </div>
 
-                <div class="group bg-transparent border border-brand-dark/15 p-10 rounded-[2rem] hover:bg-brand-dark hover:border-transparent transition-all duration-500 reveal delay-100 cursor-default">
-                    <div class="w-14 h-14 rounded-full border border-brand-dark/20 flex items-center justify-center mb-8 group-hover:border-brand-bg/30 transition-colors">
-                        <i data-lucide="users" class="w-6 h-6 text-brand-dark group-hover:text-brand-bg transition-colors"></i>
+                <div class="group bg-white/40 backdrop-blur-sm border border-brand-dark/10 p-10 md:p-12 rounded-[2.5rem] hover:bg-brand-dark transition-all duration-500 hover:shadow-hover reveal delay-100 hover-trigger">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-bg shadow-sm flex items-center justify-center mb-8 group-hover:bg-brand-dark group-hover:border group-hover:border-brand-bg/20 transition-all duration-500 transform group-hover:-translate-y-2">
+                        <i data-lucide="users" class="w-7 h-7 text-brand-dark group-hover:text-brand-bg transition-colors"></i>
                     </div>
-                    <h3 class="text-2xl font-serif text-brand-dark mb-4 group-hover:text-brand-bg transition-colors">Αυτογνωσία, Αυτοεκτίμηση & Σχέσεις</h3>
-                    <p class="text-brand-light font-light leading-relaxed mb-6 group-hover:text-brand-bg/80 transition-colors">
+                    <h3 class="text-3xl font-serif text-brand-dark mb-4 group-hover:text-brand-bg transition-colors">Αυτογνωσία & Αυτοεκτίμηση</h3>
+                    <p class="text-brand-light font-light text-lg leading-relaxed mb-8 group-hover:text-brand-bg/80 transition-colors">
                         Δεν χρειάζεται να περιμένετε μια «κρίση». Παρέχεται συμβουλευτική για ενίσχυση αυτοεκτίμησης, επίλυση συγκρούσεων (εργασία, οικογένεια) και βελτίωση επικοινωνίας, χτίζοντας υγιείς διαπροσωπικές σχέσεις.
                     </p>
-                    <div class="text-xs font-medium text-brand-dark/60 group-hover:text-brand-bg/60 uppercase tracking-wide">
-                        Αυτοεκτίμηση • Συγκρούσεις • Ενήλικες
+                    <div class="text-[10px] font-bold text-brand-dark/60 group-hover:text-brand-bg/60 uppercase tracking-[0.2em] bg-brand-dark/5 group-hover:bg-white/10 inline-block px-4 py-2 rounded-lg transition-colors">
+                        Αυτοεκτίμηση • Σχέσεις • Ενήλικες
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="approach" class="py-24 px-6 relative border-t border-brand-dark/10">
-        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+    <section id="approach" class="py-32 px-6 relative border-t border-brand-dark/5 bg-white/30">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
             <div class="reveal">
-                <span class="text-brand-dark font-semibold tracking-widest text-xs uppercase opacity-60 mb-4 block">Η ΦΙΛΟΣΟΦΙΑ ΜΟΥ</span>
-                <h2 class="text-4xl md:text-5xl font-serif text-brand-dark mb-10 text-balance">Τι Κάνει την Προσέγγισή Μου Ξεχωριστή</h2>
+                <span class="text-brand-dark font-bold tracking-[0.2em] text-[10px] uppercase opacity-60 mb-6 block">Η ΦΙΛΟΣΟΦΙΑ ΜΟΥ</span>
+                <h2 class="text-4xl md:text-5xl font-serif text-brand-dark mb-12 text-balance">Τι Κάνει την Προσέγγισή Μου Ξεχωριστή</h2>
                 
-                <div class="space-y-8">
-                    <div class="flex items-start gap-4">
-                        <div class="mt-1">
-                            <i data-lucide="coffee" class="w-6 h-6 text-brand-dark opacity-80"></i>
+                <div class="space-y-10">
+                    <div class="flex items-start gap-6 group hover-trigger">
+                        <div class="w-14 h-14 rounded-full border border-brand-dark/20 flex items-center justify-center shrink-0 text-brand-dark group-hover:bg-brand-dark group-hover:text-brand-bg transition-all duration-500 shadow-sm">
+                            <i data-lucide="coffee" class="w-6 h-6"></i>
                         </div>
                         <div>
-                            <h4 class="text-xl font-bold text-brand-dark mb-2">Η Πρώτη Συνάντηση (Χωρίς Δεσμεύσεις)</h4>
-                            <p class="text-brand-light font-light leading-relaxed">Γνωρίζω πως το πρώτο βήμα προκαλεί άγχος. Η πρώτη μας συνεδρία λειτουργεί καθαρά ως μια ήρεμη γνωριμία. Στόχος είναι να δούμε αν "ταιριάζουμε" θεραπευτικά, εντελώς ελεύθερα και χωρίς υποχρέωση συνέχισης.</p>
+                            <h4 class="text-2xl font-serif font-semibold text-brand-dark mb-2">Η Πρώτη Συνάντηση (Χωρίς Δεσμεύσεις)</h4>
+                            <p class="text-brand-light font-light text-lg leading-relaxed">Γνωρίζω πως το πρώτο βήμα προκαλεί άγχος. Η πρώτη μας συνεδρία λειτουργεί καθαρά ως μια ήρεμη γνωριμία. Στόχος είναι να δούμε αν "ταιριάζουμε" θεραπευτικά, εντελώς ελεύθερα.</p>
                         </div>
                     </div>
                     
-                    <div class="flex items-start gap-4">
-                        <div class="mt-1">
-                            <i data-lucide="tag" class="w-6 h-6 text-brand-dark opacity-80"></i>
+                    <div class="flex items-start gap-6 group hover-trigger">
+                        <div class="w-14 h-14 rounded-full border border-brand-dark/20 flex items-center justify-center shrink-0 text-brand-dark group-hover:bg-brand-dark group-hover:text-brand-bg transition-all duration-500 shadow-sm">
+                            <i data-lucide="tag" class="w-6 h-6"></i>
                         </div>
                         <div>
-                            <h4 class="text-xl font-bold text-brand-dark mb-2">Θεραπεία Χωρίς "Ταμπέλες"</h4>
-                            <p class="text-brand-light font-light leading-relaxed">Δεν χρειάζεται να έχετε κάποια «σοβαρή ψυχική νόσο» για να έρθετε στο γραφείο μου. Η αυτοβελτίωση, το καθημερινό στρες και η ανάγκη να ακουστείτε, είναι παραπάνω από έγκυροι λόγοι.</p>
+                            <h4 class="text-2xl font-serif font-semibold text-brand-dark mb-2">Θεραπεία Χωρίς "Ταμπέλες"</h4>
+                            <p class="text-brand-light font-light text-lg leading-relaxed">Δεν χρειάζεται να έχετε κάποια «σοβαρή ψυχική νόσο» για να έρθετε στο γραφείο μου. Η αυτοβελτίωση, το καθημερινό στρες και η ανάγκη να ακουστείτε, είναι παραπάνω από έγκυροι λόγοι.</p>
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-4">
-                        <div class="mt-1">
-                            <i data-lucide="compass" class="w-6 h-6 text-brand-dark opacity-80"></i>
+                    <div class="flex items-start gap-6 group hover-trigger">
+                        <div class="w-14 h-14 rounded-full border border-brand-dark/20 flex items-center justify-center shrink-0 text-brand-dark group-hover:bg-brand-dark group-hover:text-brand-bg transition-all duration-500 shadow-sm">
+                            <i data-lucide="compass" class="w-6 h-6"></i>
                         </div>
                         <div>
-                            <h4 class="text-xl font-bold text-brand-dark mb-2">Πρακτική (CBT) Εφαρμογή</h4>
-                            <p class="text-brand-light font-light leading-relaxed">Συνδυάζω την ενσυναίσθηση με τον ρεαλισμό. Μέσα από την εκπαίδευσή μου, διασφαλίζω ότι οι συζητήσεις μας δεν μένουν στη θεωρία, αλλά μεταφράζονται σε πρακτικά εργαλεία για την καθημερινότητά σας.</p>
+                            <h4 class="text-2xl font-serif font-semibold text-brand-dark mb-2">Πρακτική (CBT) Εφαρμογή</h4>
+                            <p class="text-brand-light font-light text-lg leading-relaxed">Συνδυάζω την ενσυναίσθηση με τον ρεαλισμό. Μέσα από την εκπαίδευσή μου, διασφαλίζω ότι οι συζητήσεις δεν μένουν στη θεωρία, αλλά μεταφράζονται σε πρακτικά εργαλεία.</p>
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-4">
-                        <div class="mt-1">
-                            <i data-lucide="book-open" class="w-6 h-6 text-brand-dark opacity-80"></i>
+                    <div class="flex items-start gap-6 group hover-trigger">
+                        <div class="w-14 h-14 rounded-full border border-brand-dark/20 flex items-center justify-center shrink-0 text-brand-dark group-hover:bg-brand-dark group-hover:text-brand-bg transition-all duration-500 shadow-sm">
+                            <i data-lucide="book-open" class="w-6 h-6"></i>
                         </div>
                         <div>
-                            <h4 class="text-xl font-bold text-brand-dark mb-2">Ακαδημαϊκή & Επιστημονική Επάρκεια</h4>
-                            <p class="text-brand-light font-light leading-relaxed">Το πτυχίο μου από το UEL, η μετεκπαίδευσή μου στο ΕΚΠΑ (Τραύμα & Απώλεια) και η συνεχής παρακολούθηση συνεδρίων εγγυώνται ενημερωμένη και επιστημονικά τεκμηριωμένη φροντίδα.</p>
+                            <h4 class="text-2xl font-serif font-semibold text-brand-dark mb-2">Ακαδημαϊκή Επάρκεια</h4>
+                            <p class="text-brand-light font-light text-lg leading-relaxed">Το πτυχίο μου από το UEL, η μετεκπαίδευσή μου στο ΕΚΠΑ (Τραύμα & Απώλεια) και η παρακολούθηση συνεδρίων εγγυώνται ενημερωμένη φροντίδα.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="relative reveal delay-200">
-                <div class="rounded-[2.5rem] overflow-hidden img-container shadow-premium cursor-zoom-in" onclick="openLightbox('https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%203.jpg')">
-                    <img src="https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%203.jpg" alt="Μιχάλης Μωραΐτης" class="w-full h-auto object-cover max-h-[800px]">
+            <div class="relative reveal delay-200 group">
+                <div class="absolute inset-0 rounded-[3rem] border border-brand-dark/15 transform rotate-3 scale-[1.02] transition-transform duration-1000 group-hover:rotate-6"></div>
+                <div class="rounded-[3rem] overflow-hidden image-hover-zoom shadow-premium hover:shadow-hover hover-trigger animate-float cursor-none" onclick="openLightbox('https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%203.jpg')">
+                    <img src="https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/Michailis%20Moraitis%203.jpg" alt="Μιχάλης Μωραΐτης" class="w-full h-auto object-cover max-h-[850px]">
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="reviews" class="py-32 overflow-hidden border-t border-brand-dark/10 relative">
-        <div class="max-w-7xl mx-auto px-6 mb-16 text-center reveal">
-            <h2 class="text-4xl font-serif text-brand-dark mb-6">Εμπειρίες Θεραπευόμενων</h2>
-            <p class="text-brand-light font-light max-w-2xl mx-auto text-lg">Η εμπιστοσύνη σας είναι η μεγαλύτερη απόδειξη της δουλειάς μου.</p>
+    <section id="reviews" class="py-32 overflow-hidden border-t border-brand-dark/10 relative bg-white/20">
+        <div class="max-w-7xl mx-auto px-6 mb-20 text-center reveal">
+            <h2 class="text-5xl font-serif text-brand-dark mb-6">Εμπειρίες Θεραπευόμενων</h2>
+            <div class="w-16 h-px bg-brand-dark/30 mx-auto mb-6"></div>
+            <p class="text-brand-light font-light max-w-2xl mx-auto text-xl">Η εμπιστοσύνη σας είναι η μεγαλύτερη απόδειξη της δουλειάς μου.</p>
         </div>
 
         <div class="w-full overflow-hidden relative pb-10">
-            <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-brand-bg to-transparent z-10 pointer-events-none"></div>
-            <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-brand-bg to-transparent z-10 pointer-events-none"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#EFE7DC] to-transparent z-10 pointer-events-none"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#EFE7DC] to-transparent z-10 pointer-events-none"></div>
             
             <div class="marquee-wrapper animate-marquee">
                 <div class="flex space-x-8 px-4">
-                    <div class="w-[22rem] bg-brand-bg border border-brand-dark/15 p-8 rounded-3xl shadow-premium shrink-0 relative flex flex-col">
-                        <div class="flex justify-between items-start mb-6">
+                    <div class="w-[24rem] bg-white/60 backdrop-blur-md border border-brand-dark/10 p-10 rounded-[2.5rem] shadow-premium hover:shadow-hover transition-shadow shrink-0 relative flex flex-col hover-trigger">
+                        <div class="flex justify-between items-start mb-8">
                             <div>
                                 <div class="flex items-center gap-1 text-brand-dark mb-2">
-                                    <i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 </div>
-                                <span class="font-bold text-brand-dark text-lg">10.0 / 10</span>
+                                <span class="font-bold text-brand-dark text-xl">10.0</span>
                             </div>
-                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-4 opacity-50" alt="Doctoranytime">
+                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-5 opacity-40 grayscale" alt="Doctoranytime">
                         </div>
-                        <p class="text-brand-light font-light text-sm mb-8 italic flex-grow">
-                            "Λοιπόν εγώ , από τις συνεδρίες με τον Μιχάλη τα τελευταία 2,5 χρόνια κατάφερα σιγά-σιγά να κατανοήσω καλύτερα το άγχος τις κρίσεις πανικού που βίωνα και να το διαχειρίζομαι πιο ψύχραιμα... Σε ευχαριστώ πολύ που με έχεις στηρίξει."
+                        <p class="text-brand-dark/80 font-serif text-lg mb-8 italic flex-grow leading-relaxed">
+                            "Λοιπόν εγώ , από τις συνεδρίες με τον Μιχάλη τα τελευταία 2,5 χρόνια κατάφερα σιγά-σιγά να κατανοήσω καλύτερα το άγχος τις κρίσεις πανικού που βίωνα και να το διαχειρίζομαι πιο ψύχραιμα... Σε ευχαριστώ πολύ."
                         </p>
-                        <div class="border-t border-brand-dark/10 pt-4 mt-auto">
-                            <p class="text-sm font-bold text-brand-dark">Γιώργος</p>
-                            <p class="text-xs text-brand-light mt-1">08 Μαρτίου 2026 • 1 αξιολόγηση</p>
+                        <div class="border-t border-brand-dark/10 pt-5 mt-auto">
+                            <p class="text-sm font-bold text-brand-dark uppercase tracking-widest">Γιώργος</p>
+                            <p class="text-[10px] text-brand-light mt-1 uppercase tracking-wider">08 Μαρτίου 2026 • 1 αξιολόγηση</p>
                         </div>
                     </div>
 
-                    <div class="w-[22rem] bg-brand-bg border border-brand-dark/15 p-8 rounded-3xl shadow-premium shrink-0 relative flex flex-col">
-                        <div class="flex justify-between items-start mb-6">
+                    <div class="w-[24rem] bg-white/60 backdrop-blur-md border border-brand-dark/10 p-10 rounded-[2.5rem] shadow-premium hover:shadow-hover transition-shadow shrink-0 relative flex flex-col hover-trigger">
+                        <div class="flex justify-between items-start mb-8">
                             <div>
                                 <div class="flex items-center gap-1 text-brand-dark mb-2">
-                                    <i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 </div>
-                                <span class="font-bold text-brand-dark text-lg">10.0 / 10</span>
+                                <span class="font-bold text-brand-dark text-xl">10.0</span>
                             </div>
-                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-4 opacity-50" alt="Doctoranytime">
+                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-5 opacity-40 grayscale" alt="Doctoranytime">
                         </div>
-                        <p class="text-brand-light font-light text-sm mb-8 italic flex-grow">
+                        <p class="text-brand-dark/80 font-serif text-lg mb-8 italic flex-grow leading-relaxed">
                             "Εξαιρετικός ψυχολόγος με πραγματικό ενδιαφέρον για τον άνθρωπο. Από την πρώτη συνεδρία ένιωσα ασφάλεια, αποδοχή και κατανόηση χωρίς κριτική. Η προσέγγισή του είναι επαγγελματική, ανθρώπινη και αποτελεσματική."
                         </p>
-                        <div class="border-t border-brand-dark/10 pt-4 mt-auto">
-                            <p class="text-sm font-bold text-brand-dark">Άντυ</p>
-                            <p class="text-xs text-brand-light mt-1">08 Μαρτίου 2026 • 1 αξιολόγηση</p>
+                        <div class="border-t border-brand-dark/10 pt-5 mt-auto">
+                            <p class="text-sm font-bold text-brand-dark uppercase tracking-widest">Άντυ</p>
+                            <p class="text-[10px] text-brand-light mt-1 uppercase tracking-wider">08 Μαρτίου 2026 • 1 αξιολόγηση</p>
                         </div>
                     </div>
 
-                    <div class="w-[22rem] bg-brand-bg border border-brand-dark/15 p-8 rounded-3xl shadow-premium shrink-0 relative flex flex-col">
-                        <div class="flex justify-between items-start mb-6">
+                    <div class="w-[24rem] bg-white/60 backdrop-blur-md border border-brand-dark/10 p-10 rounded-[2.5rem] shadow-premium hover:shadow-hover transition-shadow shrink-0 relative flex flex-col hover-trigger">
+                        <div class="flex justify-between items-start mb-8">
                             <div>
                                 <div class="flex items-center gap-1 text-brand-dark mb-2">
-                                    <i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 </div>
-                                <span class="font-bold text-brand-dark text-lg">10.0 / 10</span>
+                                <span class="font-bold text-brand-dark text-xl">10.0</span>
                             </div>
-                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-4 opacity-50" alt="Doctoranytime">
+                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-5 opacity-40 grayscale" alt="Doctoranytime">
                         </div>
-                        <p class="text-brand-light font-light text-sm mb-8 italic flex-grow">
-                            "Απευθύνθηκα στον Μιχάλη σε μια περίοδο που αντιμετώπιζα έντονο εργασιακό άγχος... Από την πρώτη στιγμή ένιωσα ότι υπάρχει κατανόηση και ένα ασφαλές περιβάλλον. Είναι ένας άνθρωπος με ενσυναίσθηση. Σε ευχαριστω για όλα!"
+                        <p class="text-brand-dark/80 font-serif text-lg mb-8 italic flex-grow leading-relaxed">
+                            "Απευθύνθηκα στον Μιχάλη σε μια περίοδο που αντιμετώπιζα έντονο εργασιακό άγχος... Από την πρώτη στιγμή ένιωσα ότι υπάρχει κατανόηση και ένα ασφαλές περιβάλλον. Είναι ένας άνθρωπος με ενσυναίσθηση."
                         </p>
-                        <div class="border-t border-brand-dark/10 pt-4 mt-auto">
-                            <p class="text-sm font-bold text-brand-dark">Ειρήνη</p>
-                            <p class="text-xs text-brand-light mt-1">05 Μαρτίου 2026 • 1 αξιολόγηση</p>
+                        <div class="border-t border-brand-dark/10 pt-5 mt-auto">
+                            <p class="text-sm font-bold text-brand-dark uppercase tracking-widest">Ειρήνη</p>
+                            <p class="text-[10px] text-brand-light mt-1 uppercase tracking-wider">05 Μαρτίου 2026 • 1 αξιολόγηση</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex space-x-8 px-4" aria-hidden="true">
-                    <div class="w-[22rem] bg-brand-bg border border-brand-dark/15 p-8 rounded-3xl shadow-premium shrink-0 relative flex flex-col">
-                        <div class="flex justify-between items-start mb-6">
+                    <div class="w-[24rem] bg-white/60 backdrop-blur-md border border-brand-dark/10 p-10 rounded-[2.5rem] shadow-premium hover:shadow-hover transition-shadow shrink-0 relative flex flex-col hover-trigger">
+                        <div class="flex justify-between items-start mb-8">
                             <div>
                                 <div class="flex items-center gap-1 text-brand-dark mb-2">
-                                    <i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 </div>
-                                <span class="font-bold text-brand-dark text-lg">10.0 / 10</span>
+                                <span class="font-bold text-brand-dark text-xl">10.0</span>
                             </div>
-                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-4 opacity-50" alt="Doctoranytime">
+                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-5 opacity-40 grayscale" alt="Doctoranytime">
                         </div>
-                        <p class="text-brand-light font-light text-sm mb-8 italic flex-grow">
-                            "Λοιπόν εγώ , από τις συνεδρίες με τον Μιχάλη τα τελευταία 2,5 χρόνια κατάφερα σιγά-σιγά να κατανοήσω καλύτερα το άγχος τις κρίσεις πανικού που βίωνα και να το διαχειρίζομαι πιο ψύχραιμα... Σε ευχαριστώ πολύ που με έχεις στηρίξει."
+                        <p class="text-brand-dark/80 font-serif text-lg mb-8 italic flex-grow leading-relaxed">
+                            "Λοιπόν εγώ , από τις συνεδρίες με τον Μιχάλη τα τελευταία 2,5 χρόνια κατάφερα σιγά-σιγά να κατανοήσω καλύτερα το άγχος τις κρίσεις πανικού που βίωνα και να το διαχειρίζομαι πιο ψύχραιμα... Σε ευχαριστώ πολύ."
                         </p>
-                        <div class="border-t border-brand-dark/10 pt-4 mt-auto">
-                            <p class="text-sm font-bold text-brand-dark">Γιώργος</p>
-                            <p class="text-xs text-brand-light mt-1">08 Μαρτίου 2026 • 1 αξιολόγηση</p>
+                        <div class="border-t border-brand-dark/10 pt-5 mt-auto">
+                            <p class="text-sm font-bold text-brand-dark uppercase tracking-widest">Γιώργος</p>
+                            <p class="text-[10px] text-brand-light mt-1 uppercase tracking-wider">08 Μαρτίου 2026 • 1 αξιολόγηση</p>
                         </div>
                     </div>
 
-                    <div class="w-[22rem] bg-brand-bg border border-brand-dark/15 p-8 rounded-3xl shadow-premium shrink-0 relative flex flex-col">
-                        <div class="flex justify-between items-start mb-6">
+                    <div class="w-[24rem] bg-white/60 backdrop-blur-md border border-brand-dark/10 p-10 rounded-[2.5rem] shadow-premium hover:shadow-hover transition-shadow shrink-0 relative flex flex-col hover-trigger">
+                        <div class="flex justify-between items-start mb-8">
                             <div>
                                 <div class="flex items-center gap-1 text-brand-dark mb-2">
-                                    <i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 </div>
-                                <span class="font-bold text-brand-dark text-lg">10.0 / 10</span>
+                                <span class="font-bold text-brand-dark text-xl">10.0</span>
                             </div>
-                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-4 opacity-50" alt="Doctoranytime">
+                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-5 opacity-40 grayscale" alt="Doctoranytime">
                         </div>
-                        <p class="text-brand-light font-light text-sm mb-8 italic flex-grow">
+                        <p class="text-brand-dark/80 font-serif text-lg mb-8 italic flex-grow leading-relaxed">
                             "Εξαιρετικός ψυχολόγος με πραγματικό ενδιαφέρον για τον άνθρωπο. Από την πρώτη συνεδρία ένιωσα ασφάλεια, αποδοχή και κατανόηση χωρίς κριτική. Η προσέγγισή του είναι επαγγελματική, ανθρώπινη και αποτελεσματική."
                         </p>
-                        <div class="border-t border-brand-dark/10 pt-4 mt-auto">
-                            <p class="text-sm font-bold text-brand-dark">Άντυ</p>
-                            <p class="text-xs text-brand-light mt-1">08 Μαρτίου 2026 • 1 αξιολόγηση</p>
+                        <div class="border-t border-brand-dark/10 pt-5 mt-auto">
+                            <p class="text-sm font-bold text-brand-dark uppercase tracking-widest">Άντυ</p>
+                            <p class="text-[10px] text-brand-light mt-1 uppercase tracking-wider">08 Μαρτίου 2026 • 1 αξιολόγηση</p>
                         </div>
                     </div>
 
-                    <div class="w-[22rem] bg-brand-bg border border-brand-dark/15 p-8 rounded-3xl shadow-premium shrink-0 relative flex flex-col">
-                        <div class="flex justify-between items-start mb-6">
+                    <div class="w-[24rem] bg-white/60 backdrop-blur-md border border-brand-dark/10 p-10 rounded-[2.5rem] shadow-premium hover:shadow-hover transition-shadow shrink-0 relative flex flex-col hover-trigger">
+                        <div class="flex justify-between items-start mb-8">
                             <div>
                                 <div class="flex items-center gap-1 text-brand-dark mb-2">
-                                    <i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    <i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i><i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 </div>
-                                <span class="font-bold text-brand-dark text-lg">10.0 / 10</span>
+                                <span class="font-bold text-brand-dark text-xl">10.0</span>
                             </div>
-                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-4 opacity-50" alt="Doctoranytime">
+                            <img src="https://www.doctoranytime.gr/images/logo-rebranding.svg" class="h-5 opacity-40 grayscale" alt="Doctoranytime">
                         </div>
-                        <p class="text-brand-light font-light text-sm mb-8 italic flex-grow">
-                            "Απευθύνθηκα στον Μιχάλη σε μια περίοδο που αντιμετώπιζα έντονο εργασιακό άγχος... Από την πρώτη στιγμή ένιωσα ότι υπάρχει κατανόηση και ένα ασφαλές περιβάλλον. Είναι ένας άνθρωπος με ενσυναίσθηση. Σε ευχαριστω για όλα!"
+                        <p class="text-brand-dark/80 font-serif text-lg mb-8 italic flex-grow leading-relaxed">
+                            "Απευθύνθηκα στον Μιχάλη σε μια περίοδο που αντιμετώπιζα έντονο εργασιακό άγχος... Από την πρώτη στιγμή ένιωσα ότι υπάρχει κατανόηση και ένα ασφαλές περιβάλλον. Είναι ένας άνθρωπος με ενσυναίσθηση."
                         </p>
-                        <div class="border-t border-brand-dark/10 pt-4 mt-auto">
-                            <p class="text-sm font-bold text-brand-dark">Ειρήνη</p>
-                            <p class="text-xs text-brand-light mt-1">05 Μαρτίου 2026 • 1 αξιολόγηση</p>
+                        <div class="border-t border-brand-dark/10 pt-5 mt-auto">
+                            <p class="text-sm font-bold text-brand-dark uppercase tracking-widest">Ειρήνη</p>
+                            <p class="text-[10px] text-brand-light mt-1 uppercase tracking-wider">05 Μαρτίου 2026 • 1 αξιολόγηση</p>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="text-center mt-12 reveal">
-                <a href="https://www.doctoranytime.gr/d/Psychologos/moraitis-mixalis#review-section" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-3 px-8 py-4 border border-brand-dark text-brand-dark rounded-full text-sm font-bold hover:bg-brand-dark hover:text-brand-bg transition-all">
-                    Διαβάστε περισσότερα στο <img src="https://raw.githubusercontent.com/agelmet/KARAZOLI/refs/heads/main/lgoodoc.jpg" class="h-5 ml-1 rounded-sm" alt="DoctorAnytime">
+            <div class="text-center mt-16 reveal hover-trigger">
+                <a href="https://www.doctoranytime.gr/d/Psychologos/moraitis-mixalis#review-section" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-4 px-10 py-5 border border-brand-dark text-brand-dark rounded-full text-xs font-bold tracking-[0.2em] hover:bg-brand-dark hover:text-brand-bg transition-all shadow-premium hover:shadow-hover transform hover:-translate-y-1">
+                    ΔΙΑΒΑΣΤΕ ΠΕΡΙΣΣΟΤΕΡΑ 
+                    <img src="https://raw.githubusercontent.com/agelmet/KARAZOLI/refs/heads/main/lgoodoc.jpg" class="h-5 rounded-sm" alt="DoctorAnytime">
                 </a>
             </div>
         </div>
     </section>
 
     <div id="lightbox" class="fixed inset-0 z-[100] bg-brand-dark/95 flex items-center justify-center cursor-zoom-out" onclick="closeLightbox()">
-        <button class="absolute top-8 right-8 text-brand-bg opacity-70 hover:opacity-100 transition-opacity">
+        <button class="absolute top-8 right-8 text-brand-bg opacity-70 hover:opacity-100 transition-opacity hover-trigger">
             <i data-lucide="x" class="w-10 h-10"></i>
         </button>
         <img id="lightbox-img" src="" alt="Enlarged View" class="max-w-[90vw] max-h-[90vh] object-contain rounded-2xl shadow-2xl cursor-default border border-brand-bg/10" onclick="event.stopPropagation()">
     </div>
 
-    <footer class="bg-brand-dark text-brand-bg pt-24 pb-10 relative">
+    <footer class="bg-brand-dark text-brand-bg pt-32 pb-12 relative overflow-hidden rounded-t-[4rem]">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-light/10 rounded-full blur-[100px] pointer-events-none"></div>
+
         <div class="max-w-7xl mx-auto px-6 relative z-10">
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
                 
                 <div class="lg:col-span-2 reveal">
-                    <img src="https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/logo%204.png" alt="Logo" class="h-12 mb-8 object-contain filter brightness-0 invert opacity-90">
-                    <p class="text-brand-bg/70 max-w-sm mb-8 font-light leading-relaxed">
+                    <img src="https://raw.githubusercontent.com/agelmet/MORAITIS/refs/heads/main/logo%204.png" alt="Logo" class="h-16 mb-10 object-contain filter brightness-0 invert opacity-90">
+                    <p class="text-brand-bg/80 max-w-sm mb-10 font-light text-xl leading-relaxed">
                         Το πρώτο βήμα είναι συχνά το πιο δύσκολο. Επικοινωνήστε μαζί μου για να ορίσουμε την πρώτη σας, διερευνητική συνεδρία.
                     </p>
-                    <button data-cal-link="μιχαλης-μωραιτης-gxj3qi/40min" data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}' class="inline-flex items-center justify-center bg-brand-bg text-brand-dark px-8 py-4 rounded-full font-bold hover:bg-opacity-90 transition-all shadow-lg">
-                        Κλείστε Ραντεβού
+                    <button data-cal-link="μιχαλης-μωραιτης-gxj3qi/40min" data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}' class="hover-trigger inline-flex items-center justify-center bg-brand-bg text-brand-dark px-10 py-5 rounded-full text-xs font-bold tracking-[0.2em] uppercase hover:bg-opacity-90 transition-all shadow-hover transform hover:-translate-y-1">
+                        ΚΛΕΙΣΤΕ ΡΑΝΤΕΒΟΥ
                     </button>
                 </div>
 
                 <div class="reveal delay-100">
-                    <h4 class="text-sm font-bold mb-8 uppercase tracking-widest opacity-60">ΣΤΟΙΧΕΙΑ ΕΠΙΚΟΙΝΩΝΙΑΣ</h4>
-                    <ul class="space-y-6 font-light">
-                        <li class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-brand-bg/10 flex items-center justify-center shrink-0">
-                                <i data-lucide="phone" class="w-4 h-4 text-brand-bg"></i>
+                    <h4 class="text-xs font-bold mb-8 uppercase tracking-[0.2em] opacity-60">ΣΤΟΙΧΕΙΑ ΕΠΙΚΟΙΝΩΝΙΑΣ</h4>
+                    <ul class="space-y-8 font-light text-lg">
+                        <li class="flex items-center gap-5 group hover-trigger">
+                            <div class="w-12 h-12 rounded-full border border-brand-bg/20 flex items-center justify-center shrink-0 group-hover:bg-brand-bg group-hover:text-brand-dark transition-all">
+                                <i data-lucide="phone" class="w-5 h-5"></i>
                             </div>
                             <a href="tel:+306943116880" class="hover:opacity-70 transition-opacity">694 311 6880</a>
                         </li>
-                        <li class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-brand-bg/10 flex items-center justify-center shrink-0">
-                                <i data-lucide="mail" class="w-4 h-4 text-brand-bg"></i>
+                        <li class="flex items-center gap-5 group hover-trigger">
+                            <div class="w-12 h-12 rounded-full border border-brand-bg/20 flex items-center justify-center shrink-0 group-hover:bg-brand-bg group-hover:text-brand-dark transition-all">
+                                <i data-lucide="mail" class="w-5 h-5"></i>
                             </div>
-                            <a href="mailto:info@michalismoraitis.com" class="hover:opacity-70 transition-opacity text-sm">info@michalismoraitis.com</a>
+                            <a href="mailto:info@michalismoraitis.com" class="hover:opacity-70 transition-opacity text-base">info@michalismoraitis.com</a>
                         </li>
-                        <li class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-brand-bg/10 flex items-center justify-center shrink-0">
-                                <i data-lucide="globe" class="w-4 h-4 text-brand-bg"></i>
+                        <li class="flex items-center gap-5">
+                            <div class="w-12 h-12 rounded-full border border-brand-bg/20 flex items-center justify-center shrink-0">
+                                <i data-lucide="globe" class="w-5 h-5 text-brand-bg"></i>
                             </div>
                             <span>Διαδικτυακές Συνεδρίες</span>
                         </li>
@@ -514,23 +627,29 @@
                 </div>
 
                 <div class="reveal delay-200">
-                    <h4 class="text-sm font-bold mb-8 uppercase tracking-widest opacity-60">ΩΡΑΡΙΟ ΛΕΙΤΟΥΡΓΙΑΣ</h4>
-                    <ul class="space-y-4 font-light mb-10">
-                        <li class="flex items-center gap-3">
-                            <i data-lucide="clock" class="w-4 h-4 opacity-70"></i>
+                    <h4 class="text-xs font-bold mb-8 uppercase tracking-[0.2em] opacity-60">ΩΡΑΡΙΟ ΛΕΙΤΟΥΡΓΙΑΣ</h4>
+                    <ul class="space-y-4 font-light mb-12 text-lg">
+                        <li class="flex items-center gap-4">
+                            <i data-lucide="clock" class="w-5 h-5 opacity-70"></i>
                             <span>Δευτέρα - Παρασκευή</span>
                         </li>
-                        <li class="pl-7 text-sm font-medium opacity-70">Κατόπιν Ραντεβού</li>
+                        <li class="pl-9 text-base font-medium opacity-70">Κατόπιν Ραντεβού</li>
                     </ul>
                     
                     <div class="flex gap-4">
-                        <a href="https://www.linkedin.com/in/michalis-moraitis/" target="_blank" rel="noopener" class="w-12 h-12 rounded-full border border-brand-bg/20 flex items-center justify-center hover:bg-brand-bg hover:text-brand-dark transition-all">
-                            <i data-lucide="linkedin" class="w-5 h-5"></i>
+                        <a href="https://www.linkedin.com/in/michalis-moraitis/" target="_blank" rel="noopener" class="hover-trigger w-12 h-12 rounded-full border border-brand-bg/20 flex items-center justify-center hover:bg-brand-bg hover:text-brand-dark transition-all transform hover:-translate-y-1">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
                         </a>
-                        <a href="https://www.instagram.com/michalismoraitis_psy/" target="_blank" rel="noopener" class="w-12 h-12 rounded-full border border-brand-bg/20 flex items-center justify-center hover:bg-brand-bg hover:text-brand-dark transition-all">
-                            <i data-lucide="instagram" class="w-5 h-5"></i>
+                        <a href="https://www.instagram.com/michalismoraitis_psy/" target="_blank" rel="noopener" class="hover-trigger w-12 h-12 rounded-full border border-brand-bg/20 flex items-center justify-center hover:bg-brand-bg hover:text-brand-dark transition-all transform hover:-translate-y-1">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                            </svg>
                         </a>
-                        <a href="https://www.doctoranytime.gr/d/Psychologos/moraitis-mixalis" target="_blank" rel="noopener" class="w-12 h-12 rounded-full border border-brand-bg/20 flex items-center justify-center hover:bg-brand-bg hover:text-brand-dark transition-all overflow-hidden p-3">
+                        <a href="https://www.doctoranytime.gr/d/Psychologos/moraitis-mixalis" target="_blank" rel="noopener" class="hover-trigger w-12 h-12 rounded-full border border-brand-bg/20 flex items-center justify-center hover:bg-brand-bg hover:text-brand-dark transition-all overflow-hidden p-3 transform hover:-translate-y-1">
                             <img src="https://raw.githubusercontent.com/agelmet/KARAZOLI/refs/heads/main/lgoodoc.jpg" alt="DoctorAnytime" class="w-full h-full object-contain rounded-sm filter grayscale group-hover:grayscale-0">
                         </a>
                     </div>
@@ -541,7 +660,7 @@
             <div class="border-t border-brand-bg/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 reveal text-sm font-light opacity-60">
                 <p>© 2026 Μιχάλης Μωραΐτης. Με επιφύλαξη παντός δικαιώματος.</p>
                 <p>
-                    Designed by <a href="https://advonmedia.com" target="_blank" rel="noopener" class="font-bold hover:text-brand-bg hover:opacity-100 transition-colors">Advon Media</a>
+                    Designed by <a href="https://advonmedia.com" target="_blank" rel="noopener" class="hover-trigger font-bold hover:text-brand-bg hover:opacity-100 transition-colors">Advon Media</a>
                 </p>
             </div>
         </div>
@@ -575,10 +694,12 @@
                 navbar.classList.add('py-4');
                 navbar.classList.remove('py-6');
                 navbar.firstElementChild.firstElementChild.classList.add('shadow-md');
+                navbar.firstElementChild.firstElementChild.classList.replace('bg-brand-bg/70', 'bg-brand-bg/95');
             } else {
                 navbar.classList.add('py-6');
                 navbar.classList.remove('py-4');
                 navbar.firstElementChild.firstElementChild.classList.remove('shadow-md');
+                navbar.firstElementChild.firstElementChild.classList.replace('bg-brand-bg/95', 'bg-brand-bg/70');
             }
         });
 
@@ -599,13 +720,13 @@
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
 
-        function openLightbox(imageSrc) {
+        window.openLightbox = function(imageSrc) {
             lightboxImg.src = imageSrc;
             lightbox.classList.add('active');
             document.body.style.overflow = 'hidden'; // prevent scrolling
         }
 
-        function closeLightbox() {
+        window.closeLightbox = function() {
             lightbox.classList.remove('active');
             setTimeout(() => {
                 lightboxImg.src = '';
@@ -618,6 +739,30 @@
                 closeLightbox();
             }
         });
+
+        // Custom Cursor Logic
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        const hoverTriggers = document.querySelectorAll('.hover-trigger, a, button');
+
+        if (window.matchMedia("(pointer: fine)").matches) {
+            window.addEventListener('mousemove', (e) => {
+                const posX = e.clientX;
+                const posY = e.clientY;
+                cursorDot.style.left = `${posX}px`;
+                cursorDot.style.top = `${posY}px`;
+                
+                setTimeout(() => {
+                    cursorOutline.style.left = `${posX}px`;
+                    cursorOutline.style.top = `${posY}px`;
+                }, 80);
+            });
+
+            hoverTriggers.forEach(trigger => {
+                trigger.addEventListener('mouseenter', () => document.body.classList.add('hover-state'));
+                trigger.addEventListener('mouseleave', () => document.body.classList.remove('hover-state'));
+            });
+        }
     </script>
 </body>
 </html>
